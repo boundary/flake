@@ -1,3 +1,7 @@
 ebin/
 .eunit/
+*.dump
+deps/
+rel/flake/
+.DS_Store
 

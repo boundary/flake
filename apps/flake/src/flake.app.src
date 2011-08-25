@@ -1,0 +1,15 @@
+{application, flake,
+ [
+  {description, "flake"},
+  {vsn, git},
+  {modules, []},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  crypto,
+                  syslog
+                 ]},
+  {mod, { flake_app, []}},
+  {env, []}
+ ]}.
