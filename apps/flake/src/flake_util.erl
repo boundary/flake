@@ -1,6 +1,8 @@
 -module (flake_util).
 -export ([as_list/2]).
 -export ([get_if_hw_int/1,hw_addr_to_int/1]).
+-export ([curr_time_millis/0]).
+-export ([gen_id/3]).
 
 % get the mac/hardware address of the given interface as a 48-bit integer
 get_if_hw_int(undefined) ->
@@ -20,6 +22,13 @@ get_if_hw_int(IfName) ->
 hw_addr_to_int(HwAddr) ->
   <<WorkerId:48/unsigned-integer>> = erlang:list_to_binary(HwAddr),
   WorkerId.
+
+curr_time_millis() ->
+  {MegaSec,Sec,MicroSec} = erlang:now(),
+  1000000000*MegaSec + Sec*1000 + erlang:trunc(MicroSec/1000).
+
+gen_id(Time,WorkerId,Sequence) ->
+  ( Time bsl 64 ) + ( WorkerId bsl 16 ) + Sequence.
 
 %%
 % n.b. - unique_id_62/0 and friends pulled from riak

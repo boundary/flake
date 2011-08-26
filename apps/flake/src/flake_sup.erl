@@ -41,20 +41,47 @@ upgrade() ->
 %% @spec init([]) -> SupervisorTree
 %% @doc supervisor callback.
 init([]) ->
-  If = flake:get_config_value("interface","en0"),
+  If = flake:get_config_value(interface,"eth0"),
+  error_logger:info_msg("starting flake with hardware address of ~p as worker id~n",[If]),
   {ok,WorkerId} = flake_util:get_if_hw_int(If),
-  Config = [
+  error_logger:info_msg("using worker id: ~p~n",[WorkerId]),
+  
+  FlakeConfig = [
       {worker_id,WorkerId}
     ],
   Flake = {flake,
-    {flake_server,start_link,[Config]},
+    {flake_server,start_link,[FlakeConfig]},
     permanent, 5000, worker, [flake_server]},
-    
-  % SyslogOpts = flake:get_config_value(syslog, [{hostname, "syslog.cid1.boundary.com"}, {facility, local5}]), 
-  % Syslog = {syslog, {syslog, start_link, [flake, 
-  %                                         flake, 
-  %                                         proplists:get_value(hostname, SyslogOpts),
-  %                                         514, 
-  %                                         proplists:get_value(facility, SyslogOpts)]}, permanent, 2000, worker, [syslog]},
-  Processes = [Flake],
-  {ok, { {one_for_one, 10, 10}, Processes} }.
+  
+  TimestampPath = flake:get_config_value(timestamp_path,"/tmp/flake-timestamp"),
+  AllowableDowntime = flake:get_config_value(allowable_downtime,0),
+
+  {ok,TS} = persistent_timer:read_timestamp(TimestampPath),
+  Now = flake_util:curr_time_millis(),
+  TimeSinceLastRun = Now - TS,
+
+  % fail startup if
+  % 1) the clock time last recorded is later than the current time
+  % 2) the last recorded time is more than N ms in the past to prevent
+  %    generating future ids in the event that the system clock is set to some point far in the future
+  check_for_clock_error(Now > TS,TimeSinceLastRun < AllowableDowntime),
+
+  error_logger:info_msg("saving timestamps to ~p every 1s~n",[TimestampPath]),
+  TimerConfig = [
+    {path,TimestampPath},
+    {interval,1000}
+  ],
+  PersistentTimer = {persistent_timer,
+    {persistent_timer,start_link,[TimerConfig]},
+    permanent, 5000, worker, [persistent_timer]},
+  
+  {ok, { {one_for_one, 10, 10}, [Flake,PersistentTimer]} }.
+
+check_for_clock_error(true,true) ->
+  ok;
+check_for_clock_error(false,_) ->
+  error_logger:error_msg("system running backwards, failing startup of snowflake service~n"),
+  exit(clock_running_backwards);
+check_for_clock_error(_,false) ->
+  error_logger:error_msg("system clock too far advanced, failing startup of snowflake service~n"),
+  exit(clock_advanced).
