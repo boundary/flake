@@ -31,7 +31,7 @@ curr_time_millis() ->
   1000000000*MegaSec + Sec*1000 + erlang:trunc(MicroSec/1000).
 
 gen_id(Time,WorkerId,Sequence) ->
-  <<Time:64,WorkerId:48,Sequence:16>>.
+  <<Time:64/integer,WorkerId:48/integer,Sequence:16/integer>>.
 
 %%
 % n.b. - unique_id_62/0 and friends pulled from riak
