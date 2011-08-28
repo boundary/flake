@@ -1,7 +1,7 @@
 {application, flake,
  [
   {description, "flake"},
-  {vsn, git},
+  {vsn, "0.5"},
   {modules, []},
   {registered, []},
   {applications, [
