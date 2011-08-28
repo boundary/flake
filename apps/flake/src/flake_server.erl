@@ -47,7 +47,8 @@ handle_call({get,Base}, _From, State = #state{max_time=MaxTime,worker_id=WorkerI
   {Resp,S0} = get(flake_util:curr_time_millis(),MaxTime,WorkerId,Sequence,State),
   case Resp of
     {ok,Id} ->
-      {reply,{ok,flake_util:as_list(Id,Base)},S0};
+      <<IntId:128/integer>> = Id,
+      {reply,{ok,flake_util:as_list(IntId,Base)},S0};
     E ->
       {reply,E,S0}
   end;
@@ -80,22 +81,9 @@ get(CurrTime,MaxTime,_WorkerId,_Sequence,State) when MaxTime > CurrTime ->
 %% tests
 %% ----------------------------------------------------------
 
-flake_test() ->
-  TS = flake_util:curr_time_millis(),
-  Worker = flake_util:hw_addr_to_int(lists:seq(1,6)),
-  Flake = flake_util:gen_id(TS,Worker,0),
-  ?debugVal(Flake),
-  <<Time:64/unsigned-integer,WorkerId:48/unsigned-integer,Sequence:16/unsigned-integer>> = <<Flake:128/unsigned-integer>>,
-  ?assert(?debugVal(Time) =:= TS),
-  ?assert(?debugVal(Worker) =:= WorkerId),
-  ?assert(?debugVal(Sequence) =:= 0),
-  ?debugVal(flake_util:as_list(Flake,62)),
-  test_gen_server(),
-  ok.
-
-test_gen_server() ->
-  Worker = flake_util:hw_addr_to_int(lists:seq(1,6)),
-  {ok,FlakeServer} = flake_server:start_link([{worker_id,Worker}]),
-  ?debugVal(flake_server:id()),
-  ?debugVal(flake_server:id(62)),
-  ok.
+% gen_server_test() ->
+%   Worker = flake_util:hw_addr_to_int(lists:seq(1,6)),
+%   {ok,FlakeServer} = flake_server:start_link([{worker_id,Worker}]),
+%   {ok,_} = ?debugVal(flake_server:id()),
+%   {ok,_} = ?debugVal(flake_server:id(62)),
+%   ok.

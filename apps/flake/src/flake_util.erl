@@ -4,6 +4,8 @@
 -export ([curr_time_millis/0]).
 -export ([gen_id/3]).
 
+-include_lib("eunit/include/eunit.hrl").
+
 % get the mac/hardware address of the given interface as a 48-bit integer
 get_if_hw_int(undefined) ->
   {error,if_not_found};
@@ -20,7 +22,8 @@ get_if_hw_int(IfName) ->
 
 % convert an array of 6 bytes into a 48-bit integer
 hw_addr_to_int(HwAddr) ->
-  <<WorkerId:48/unsigned-integer>> = erlang:list_to_binary(HwAddr),
+  erlang:list_to_binary(HwAddr),
+  <<WorkerId:48/integer>> = erlang:list_to_binary(HwAddr),
   WorkerId.
 
 curr_time_millis() ->
@@ -28,7 +31,7 @@ curr_time_millis() ->
   1000000000*MegaSec + Sec*1000 + erlang:trunc(MicroSec/1000).
 
 gen_id(Time,WorkerId,Sequence) ->
-  ( Time bsl 64 ) + ( WorkerId bsl 16 ) + Sequence.
+  <<Time:64,WorkerId:48,Sequence:16>>.
 
 %%
 % n.b. - unique_id_62/0 and friends pulled from riak
@@ -73,3 +76,21 @@ as_list(I0, Base, R0) ->
     true ->
       as_list(I1, Base, R1)
   end.
+  
+  
+  
+%% ----------------------------------------------------------
+%% tests
+%% ----------------------------------------------------------
+
+flake_test() ->
+  TS = flake_util:curr_time_millis(),
+  Worker = flake_util:hw_addr_to_int(lists:seq(1,6)),
+  Flake = flake_util:gen_id(TS,Worker,0),
+  <<Time:64/integer,WorkerId:48/integer,Sequence:16/integer>> = Flake,
+  ?assert(?debugVal(Time) =:= TS),
+  ?assert(?debugVal(Worker) =:= WorkerId),
+  ?assert(?debugVal(Sequence) =:= 0),
+  <<FlakeInt:128/integer>> = Flake,
+  ?debugVal(flake_util:as_list(FlakeInt,62)),
+  ok.
