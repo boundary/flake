@@ -22,7 +22,6 @@ get_if_hw_int(IfName) ->
 
 % convert an array of 6 bytes into a 48-bit integer
 hw_addr_to_int(HwAddr) ->
-  erlang:list_to_binary(HwAddr),
   <<WorkerId:48/integer>> = erlang:list_to_binary(HwAddr),
   WorkerId.
 
