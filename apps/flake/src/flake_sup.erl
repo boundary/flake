@@ -53,11 +53,20 @@ init([]) ->
     {flake_server,start_link,[FlakeConfig]},
     permanent, 5000, worker, [flake_server]},
   
-  TimestampPath = flake:get_config_value(timestamp_path,"/tmp/flake-timestamp"),
+  TimestampPath = flake:get_config_value(timestamp_path,"/tmp/flake-timestamp-dets"),
   AllowableDowntime = flake:get_config_value(allowable_downtime,0),
 
-  {ok,TS} = persistent_timer:read_timestamp(TimestampPath),
+  {ok,TimestampTable} =
+    dets:open_file(timestamp_table,[
+      {estimated_no_objects,10},
+      {type,set},
+      {file,TimestampPath}
+    ]),
+
+  {ok,TS} = persistent_timer:read_timestamp(TimestampTable),
+  ?debugVal(TS),
   Now = flake_util:curr_time_millis(),
+  ?debugVal(Now),
   TimeSinceLastRun = Now - TS,
 
   % fail startup if
@@ -68,7 +77,7 @@ init([]) ->
 
   error_logger:info_msg("saving timestamps to ~p every 1s~n",[TimestampPath]),
   TimerConfig = [
-    {path,TimestampPath},
+    {table,TimestampTable},
     {interval,1000}
   ],
   PersistentTimer = {persistent_timer,
