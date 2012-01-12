@@ -1,4 +1,3 @@
 #!/bin/sh
 
-rebar clean compile generate
-./rel/flake/bin/flake
+rebar clean compile generate && ./rel/flake/bin/flake
