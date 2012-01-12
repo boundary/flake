@@ -19,19 +19,32 @@
 
 -export ([
 	  generate/1,
-	  timed_generate/1
+	  generate/2,
+	  timed_generate/1,
+	  timed_generate/2
 	 ]).
 
 -include_lib("eunit/include/eunit.hrl").
 
 generate(N) ->
-    generate_ids(N, []).
+    generate_ids(N, undefined, []).
 
 timed_generate(N) ->
     ?debugTime("generating ids", generate(N)).
 
-generate_ids(0, Acc) ->
+generate(N, Base) ->
+    generate_ids(N, Base, []).
+
+timed_generate(N, Base) ->
+    ?debugTime("generating ids", generate(N, Base)).
+
+generate_ids(0, _Base, Acc) ->
     Acc;
-generate_ids(N, Acc) ->
-    {ok, Flake} = flake_server:id(62),
-    generate_ids(N-1, [Flake|Acc]).
+generate_ids(N, Base, Acc) ->
+    {ok, Flake} = case Base of
+		      undefined ->
+			  flake_server:id();
+		      _ ->
+			  flake_server:id(Base)
+		  end,
+    generate_ids(N-1, Base, [Flake|Acc]).
