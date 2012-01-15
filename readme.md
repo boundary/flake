@@ -16,6 +16,7 @@ Then edit <tt>rel/files/sys.config</tt> to fit your environment.
 * <tt>allowable_downtime</tt> - an added safeguard to prevent flake from starting up if it sees it hasn't run in a long period of time according to the system clock since this might be an indication that the clock has been skewed far into the future.
 
 Example configuration:
+
 ```erlang
 	[
 	 {flake, [
