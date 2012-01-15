@@ -113,7 +113,7 @@ The next problem is clock skew and protection against replaying ids for a time i
 
 **When are flake ids _not_ appropriate?**
 
-Flake ids are predictable by design. Don't use use flake to generate ids that you'd rather be unpredictable. Don't use flake ids to generate passwords, security tokens, or anything else you wouldn't want someone to be able to guess.
+Flake ids are predictable by design. Don't use use flake to generate ids that you'd rather be unpredictable. Don't use flake to generate passwords, security tokens, or anything else you wouldn't want someone to be able to guess.
 
 Flake ids expose the identity of the machine which generated the id (by way of its MAC address) and the time at which it did so. This could be a problem for some security-sensitive applications.
 
