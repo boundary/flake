@@ -16,14 +16,15 @@ Then edit <tt>rel/files/sys.config</tt> to fit your environment.
 * <tt>allowable_downtime</tt> - an added safeguard to prevent flake from starting up if it sees it hasn't run in a long period of time according to the system clock since this might be an indication that the clock has been skewed far into the future.
 
 Example configuration:
-
+```erlang
 	[
 	 {flake, [
 	    {interface, "en0"},
 	    {timestamp_path, "/srv/flake/timestamp-dets"},
 	    {allowable_downtime, 2592000000}
 	  ]}
-	].
+	]
+```
 
 Then simply run the server inline
 
@@ -32,7 +33,6 @@ Then simply run the server inline
 And use the embedded test harness to ensure that you are able to generate ids.
 
 Generate 1 id and receive the erlang binary
-
 	(flake@localhost)1> flake_harness:generate(1).
 
 	[<<0,0,1,52,212,33,45,67,16,154,221,94,14,143,0,0>>]
@@ -53,7 +53,6 @@ Time how long it takes to generate 100,000 ids
 
 	src/flake_harness.erl:33: generating ids: 0.402 s
 
-
 These last steps simple ensure that a flake application is up and running. Next we'll talk more about operational use.
 
 
@@ -63,6 +62,7 @@ Flake is a standalone application. Request ids with a <tt>gen_server:call</tt> f
 
 Example usage from your application.
 
+```erlang
 	flake() ->
 	    Node = {flake, flake@localhost},
 	    {ok, FlakeId} = gen_server:call(Node, get),
@@ -70,6 +70,7 @@ Example usage from your application.
 		%% example id decomposition for demonstration only
     	<<_Time:64/integer,_WorkerId:48/integer,_Sequence:16/integer>> = FlakeId,
    	 	FlakeId.
+```
 
 # Anatomy
 
