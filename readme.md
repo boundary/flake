@@ -87,7 +87,7 @@ Flake ids are 128-bits wide described here from most significant to least signif
 * Bulk id generation
 * HTTP interface
 * Client library (Erlang, possibly others)
-	* Provides an abstraction for the messaging format
+	* Provide an abstraction for the messaging format to avoid using gen_server calls as the public API.
 	* Will generate a notional flake id (with an empty worker id) given a timestamp. This is useful for generating a lexical range of values that could have been generated in a span of time. At Boundary we store data in Riak keyed by flake ids and use keyfilters to page out blocks of data using this technique.
 
 
