@@ -77,9 +77,9 @@ Example usage from your application.
 
 Flake ids are 128-bits wide described here from most significant to least significant bits.
 
-64-bit timestamp - milliseconds since the epoch (Jan 1 1970)
-48-bit worker id - MAC address from a configurable device
-16-bit sequence # - usually 0, incremented when more than one id is requested in the same millisecond and reset to 0 when the clock ticks forward
+* 64-bit timestamp - milliseconds since the epoch (Jan 1 1970)
+* 48-bit worker id - MAC address from a configurable device
+* 16-bit sequence # - usually 0, incremented when more than one id is requested in the same millisecond and reset to 0 when the clock ticks forward
 
 
 # Roadmap
