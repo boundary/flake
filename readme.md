@@ -3,7 +3,7 @@
 
 Flake produces 128-bit, k-ordered ids (read time-ordered lexically). Run one on each node in your infrastructure and they will generate conflict-free ids on-demand without coordination.
 
-Read the original [post](http://blog.boundary.com/2012/01/12/Flake-A-decentralized-k-ordered-id-generation-service-in-Erlang.html) on the Boundary blog.
+Read the original [post](http://blog.boundary.com/2012/01/12/flake-a-decentralized-k-ordered-unique-id-generator-in-erlang/) on the Boundary blog.
 
 To get started
 
