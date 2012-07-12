@@ -99,7 +99,7 @@ An HTTP interface is on the roadmap. For applications written in Scala, [Scalang
 
 **How does this differ from snowflake developed at Twitter?**
 
-The differences stem primarily from the fact that Twitter snowflake ids are 64-bits wide. This means that additional coordination is required to pick a worker id (twitter does this via a ZooKeeper ensemble) and a new epoch must be defined so that timestamps can fit into a small number of bits. Their scheme works great when your ids must fit into 64-bits. However this comes at the cost of additional coordination among nodes and a system that is generally a little more difficult to reason about. It is a fine system though and we were able to learn from it in our efforts.
+The differences stem primarily from the fact that Twitter snowflake ids are 64-bits wide. This means that additional coordination is required to pick a worker id (twitter does this via a ZooKeeper ensemble). Their scheme works great when your ids must fit into 64-bits. However this comes at the cost of additional coordination among nodes and a system that is generally a little more difficult to reason about. It is a fine system though and we were able to learn from it in our efforts.
 
 **How is flake different from rearranging the bits of a UUID-1 id?**
 
