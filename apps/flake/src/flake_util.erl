@@ -34,19 +34,20 @@ get_default_if() ->
     Ifs = [I || {I, Props} <- SysIfs, filter_if(Props)],
     hd(Ifs).
 
+% filter network interfaces
 filter_if(Props) ->
     HwAddr = proplists:get_value(hwaddr, Props),
-    case HwAddr of
-        % We exclude interfaces without a MAC address
-        undefined ->
-            false;
-        % We exclude interfaces with a null MAC address, ex: loopback devices
-        [0,0,0,0,0,0] ->
-            false;
-        % All others are valid interfaces to pick from
-        _ ->
-            true
-    end.
+    filter_hwaddr(HwAddr).
+
+% we exclude interfaces without a MAC address
+filter_hwaddr(undefined) ->
+    false;
+% we exclude interfaces with a null MAC address, ex: loopback devices
+filter_hwaddr([0,0,0,0,0,0]) ->
+    false;
+% all others are valid interfaces to pick from
+filter_hwaddr(_) ->
+    true.
 
 %% get the mac/hardware address of the given interface as a 48-bit integer
 get_if_hw_int(undefined) ->
